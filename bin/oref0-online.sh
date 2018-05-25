@@ -37,7 +37,8 @@ main() {
                         print_bluetooth_name
                 #fi
             if ! has_ip bnep0; then
-                sudo dhclient bnep0
+                #sudo dhclient bnep0
+		ifconfig bnep0 192.168.44.43 netmask 255.255.255.0
             fi
             echo -n "At $(date) my local Bluetooth IP is: "
             print_local_ip bnep0
@@ -75,8 +76,8 @@ main() {
 	    #check if default route is using BT PAN, if not remove all gateways and release/renew bt dhcp lease
             if ! ip route get 8.8.8.8 | egrep -q "bnep0" >/dev/null; then
                 ip route del 0/0
-                sudo dhclient bnep0 -r -q
-                sudo dhclient bnep0
+                ifconfig bnep0 192.168.44.43 netmask 255.255.255.0
+		ip route add default via 192.168.44.1 dev bnep0
             fi
         else
             bt_connect $MACs
@@ -158,7 +159,7 @@ function bt_connect {
         sudo bt-pan client $MAC && sudo dhclient bnep0
         if ifconfig | egrep -q "bnep0" >/dev/null; then
             if ! has_ip bnep0; then
-                sudo dhclient bnep0
+		ifconfig bnep0 192.168.44.43 netmask 255.255.255.0
             fi
             echo -n "Connected to Bluetooth with IP: "
             print_local_ip bnep0
